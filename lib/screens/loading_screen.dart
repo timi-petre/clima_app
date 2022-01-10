@@ -1,39 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import '/services/weather.dart';
+import 'location_screen.dart';
 
 class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({Key? key}) : super(key: key);
+
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  String? text;
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
 
   Future<void> getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    final dynamic weatherData = await WeatherModel().getLocationWeather();
     setState(() {
-      text = position.toString();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LocationScreen(locationWeather: weatherData),
+        ),
+      );
     });
-    print(position);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  //Get the current location
-                  getLocation();
-                },
-                child: Text('Get Location'),
-              ),
-              Text(text ?? 'No location yet'),
-            ],
-          ),
+    return const Scaffold(
+      body: Center(
+        child: SpinKitDoubleBounce(
+          color: Colors.white,
         ),
       ),
     );
